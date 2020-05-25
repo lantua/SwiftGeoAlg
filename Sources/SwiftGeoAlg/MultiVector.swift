@@ -7,36 +7,28 @@
 
 import Foundation
 
-public protocol Basis: Hashable {
-    static var positiveBases: Int { get }
-    static var negativeBases: Int { get }
-    static var zeroBases: Int { get }
+public typealias BasisStorage = UInt8
+
+public protocol Algebra: Hashable {
+    // Bitmasks representing positive/negative/zero bases. These bitmask must be mutually exclusive.
+    static var metricSignature: (positive: BasisStorage, zero: BasisStorage, negative: BasisStorage) { get }
 }
 
-public struct MultiVector<B: Basis> {
+public struct MultiVector<Alg: Algebra> {
     public typealias Scalar = Double
-    fileprivate var terms: [Int: Scalar]
+
+    var terms: [BasisStorage: Scalar]
 
     mutating func removeZeroTerms(threshold: Scalar) {
         terms = terms.filter { $0.value.magnitude >= threshold }
     }
 
-    public init(terms: [Int: Scalar]) {
-        self.terms = terms
+    public static subscript(value: Int) -> Int {
+
     }
 }
 
-infix operator ⌋: InnerProduct
-infix operator ⌊: InnerProduct
-infix operator ∧: OuterProduct
-
-precedencegroup InnerProduct {
-    higherThan: MultiplicationPrecedence
-}
-
-precedencegroup OuterProduct {
-    higherThan: InnerProduct
-}
+// MARK: Conformances
 
 extension MultiVector: AdditiveArithmetic {
     public static var zero: MultiVector { .init(terms: [:]) }
@@ -68,11 +60,14 @@ extension MultiVector: ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
     }
 }
 
+// MARK: Inner/Outer Products
+
 extension MultiVector {
+    /// Geometric Product
     public static func *(lhs: MultiVector, rhs: MultiVector) -> MultiVector {
         mul(lhs, rhs, include: { _, _ in true })
     }
-    /// Outer product
+    /// Outer Product
     public static func ∧(lhs: MultiVector, rhs: MultiVector) -> MultiVector {
         mul(lhs, rhs, include: { $0 & $1 == 0 })
     }
@@ -85,23 +80,16 @@ extension MultiVector {
         mul(lhs, rhs, include: { ~$0 & $1 == 0 })
     }
 
-    public static func scalarProduct(lhs: MultiVector, rhs: MultiVector) -> MultiVector {
-        mul(lhs, rhs, include: { $0 == $1 })
-    }
-    public static func fatDot(lhs: MultiVector, rhs: MultiVector) -> MultiVector {
-        mul(lhs, rhs, include: { ~$0 & $1 == 0 || $0 & ~$1 == 0 })
-    }
-
-    private static func mul(_ lhs: MultiVector, _ rhs: MultiVector, include: (Int, Int) -> Bool) -> MultiVector {
-        var terms: [Int: Double] = [:]
+    private static func mul(_ lhs: MultiVector, _ rhs: MultiVector, include: (BasisStorage, BasisStorage) -> Bool) -> MultiVector {
+        var terms: [BasisStorage: Double] = [:]
         for (k1, v1) in lhs.terms {
             for (k2, v2) in rhs.terms where include(k1, k2) {
-                let duplicatedBases = k1 & k2
-                guard duplicatedBases & B.zeroBases == 0 else {
+                let (_, zeroBases, negativeBases) = Alg.metricSignature, duplicatedBases = k1 & k2
+                guard duplicatedBases & zeroBases == 0 else {
                     continue
                 }
                 let k = k1 ^ k2
-                if (duplicatedBases & B.negativeBases).nonzeroBitCount.isMultiple(of: 2) != self.flip(k1, k2) {
+                if (duplicatedBases & negativeBases).nonzeroBitCount.isMultiple(of: 2) != self.flip(k1, k2) {
                     terms[k, default: 0] += v1 * v2
                 } else {
                     terms[k, default: 0] -= v1 * v2
@@ -112,7 +100,7 @@ extension MultiVector {
         return MultiVector(terms: terms)
     }
 
-    private static func flip(_ lhs: Int, _ rhs: Int) -> Bool {
+    private static func flip(_ lhs: BasisStorage, _ rhs: BasisStorage) -> Bool {
         var flip = rhs.nonzeroBitCount & 0x2 != 0
         var rhs = rhs, interests = lhs ^ rhs
 
