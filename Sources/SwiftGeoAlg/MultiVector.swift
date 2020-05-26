@@ -25,12 +25,7 @@ public struct BasisStorage: OptionSet, Hashable {
 }
 
 public struct MultiVector<Alg: Algebra> {
-
     fileprivate var terms: [BasisStorage: Scalar]
-
-    mutating func removeZeros(threshold: Scalar) {
-        terms = terms.filter { $0.value.magnitude > threshold }
-    }
 
     public init(terms: [BasisStorage: Scalar]) {
         self.terms = terms
@@ -38,31 +33,36 @@ public struct MultiVector<Alg: Algebra> {
 }
 
 public extension MultiVector {
-    var dual: Self {
-        let (p, n, z) = Alg.metricSignature
-        let bases: BasisStorage = [p, z, n]
-        let negative = (bases.count + 1) & 2 == 0
-        return self * .init(terms: [bases: negative ? -1 : 1])
+    mutating func removeZeros(threshold: Scalar) {
+        terms = terms.filter { $0.value.magnitude > threshold }
+    }
+
+    var reversed: Self {
+        var terms = self.terms
+        for key in terms.keys where key.count & 2 != 0 {
+            terms[key] = -terms[key]!
+        }
+        return .init(terms: terms)
     }
 }
 
 // MARK: Conformances
 
 extension MultiVector: AdditiveArithmetic {
-    public static var zero: MultiVector { .init(terms: [:]) }
+    public static var zero: Self { .init(terms: [:]) }
 
-    public static func += (lhs: inout MultiVector, rhs: MultiVector) {
+    public static func += (lhs: inout Self, rhs: Self) {
         lhs.terms.merge(rhs.terms, uniquingKeysWith: +)
     }
-    public static func -= (lhs: inout MultiVector, rhs: MultiVector) {
+    public static func -= (lhs: inout Self, rhs: Self) {
         lhs.terms.merge(rhs.terms.mapValues(-), uniquingKeysWith: +)
     }
-    public static func +(lhs: MultiVector, rhs: MultiVector) -> MultiVector {
+    public static func +(lhs: Self, rhs: Self) -> Self {
         var lhs = lhs
         lhs += rhs
         return lhs
     }
-    public static func -(lhs: MultiVector, rhs: MultiVector) -> MultiVector {
+    public static func -(lhs: Self, rhs: Self) -> Self {
         var lhs = lhs
         lhs -= rhs
         return lhs
@@ -78,22 +78,27 @@ extension MultiVector: ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
     }
 }
 
-// MARK: Inner/Outer Products
+// MARK: Multiplications
 
 extension MultiVector {
-    /// Geometric Product
-    public static func *(lhs: MultiVector, rhs: MultiVector) -> MultiVector { mul(lhs, rhs) { _, _ in true } }
-    public static func dot(lhs: MultiVector, rhs: MultiVector) -> MultiVector { mul(lhs, rhs) { $0 == $1 } }
+    /// Scalar Product
+    public static func ⊛(lhs: Self, rhs: Self) -> Self { mul(lhs, rhs) { $0 == $1 } }
+    /// Left Inner Contraction
+    public static func ⌋(lhs: Self, rhs: Self) -> Self { mul(lhs, rhs) { $0.isSubset(of: $1) } }
+    /// Right Inner Contraction
+    public static func ⌊(lhs: Self, rhs: Self) -> Self { mul(lhs, rhs) { $0.isSuperset(of: $1) } }
+    /// Fat dot product
+    public static func •(lhs: Self, rhs: Self) -> Self { mul(lhs, rhs) { $0.isSubset(of: $1) || $0.isSuperset(of: $1) } }
     /// Outer Product
-    public static func ∧(lhs: MultiVector, rhs: MultiVector) -> MultiVector { mul(lhs, rhs) { $0.intersection($1).isEmpty } }
+    public static func ∧(lhs: Self, rhs: Self) -> Self { mul(lhs, rhs) { $0.intersection($1).isEmpty } }
 
-    /// Left Contraction
-    public static func ⌋(lhs: MultiVector, rhs: MultiVector) -> MultiVector { mul(lhs, rhs) { $0.isSubset(of: $1) } }
-    /// Right Contraction
-    public static func ⌊(lhs: MultiVector, rhs: MultiVector) -> MultiVector { mul(lhs, rhs) { $0.isSuperset(of: $1) } }
-    public static func /(lhs: MultiVector, rhs: Scalar) -> MultiVector { .init(terms: lhs.terms.mapValues { $0 / rhs }) }
+    public static func *(lhs: Scalar, rhs: Self) -> Self { rhs * lhs }
+    public static func *(lhs: Self, rhs: Scalar) -> Self { .init(terms: lhs.terms.mapValues { $0 * rhs }) }
+    public static func /(lhs: Self, rhs: Scalar) -> Self { .init(terms: lhs.terms.mapValues { $0 / rhs }) }
 
-    private static func mul(_ lhs: MultiVector, _ rhs: MultiVector, isIncluded: (BasisStorage, BasisStorage) -> Bool) -> MultiVector {
+    public static func multiply(_ lhs: Self, _ rhs: Self) -> Self { mul(lhs, rhs) { _, _ in true } }
+
+    private static func mul(_ lhs: Self, _ rhs: Self, isIncluded: (BasisStorage, BasisStorage) -> Bool) -> Self {
         let (_, negatives, zeros) = Alg.metricSignature
 
         var terms: [BasisStorage: Double] = [:]
@@ -112,7 +117,7 @@ extension MultiVector {
             }
         }
 
-        return MultiVector(terms: terms)
+        return .init(terms: terms)
     }
 
     private static func flip(_ lhs: BasisStorage, _ rhs: BasisStorage) -> Bool {
