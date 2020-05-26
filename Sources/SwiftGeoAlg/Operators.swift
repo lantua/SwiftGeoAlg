@@ -15,4 +15,5 @@ precedencegroup InnerProductPrecedence {
 
 precedencegroup OuterProductPrecedence {
     higherThan: MultiplicationPrecedence
+    associativity: left
 }
