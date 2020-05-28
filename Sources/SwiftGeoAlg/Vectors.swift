@@ -17,7 +17,7 @@ public protocol BasisChain {
     associatedtype MultiVector: VectorStorage
 }
 
-public enum Last: BasisChain {
+public enum EndChain: BasisChain {
     public typealias MultiVector = Scalar
 }
 public enum Chained<Current: Basis, Next: BasisChain>: BasisChain {
@@ -30,7 +30,7 @@ public protocol ParityBasisChain {
     associatedtype Odd: VectorStorage = Empty
     associatedtype Even: VectorStorage = Empty
 }
-extension Last: ParityBasisChain {
+extension EndChain: ParityBasisChain {
     public typealias Even = Scalar
 }
 extension Chained: ParityBasisChain where Next: ParityBasisChain {
@@ -51,7 +51,7 @@ public protocol GradedBasisChain {
     associatedtype Grade7: VectorStorage = Empty
     associatedtype Grade8: VectorStorage = Empty
 }
-extension Last: GradedBasisChain {
+extension EndChain: GradedBasisChain {
     public typealias Grade0 = Scalar
 }
 extension Chained: GradedBasisChain where Next: GradedBasisChain {
@@ -66,5 +66,9 @@ extension Chained: GradedBasisChain where Next: GradedBasisChain {
     public typealias Grade8 = Vector<Current, Next.Grade7, Next.Grade8>
 }
 
-public typealias Bases2<B1: Basis, B2: Basis> = Chained<B1, Chained<B2, Last>>
+// MARK: Helpers
+
+public typealias Base1<B1: Basis> = Chained<B1, EndChain>
+public typealias Base2<B1: Basis, B2: Basis> = Chained<B1, Base1<B2>>
+public typealias Base3<B1: Basis, B2: Basis, B3: Basis> = Bases<B1, B2, B3, EndChain>
 public typealias Bases<B1: Basis, B2: Basis, B3: Basis, Tail: BasisChain> = Chained<B1, Chained<B2, Chained<B3, Tail>>>

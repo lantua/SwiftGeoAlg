@@ -17,13 +17,14 @@ public protocol VectorStorage {
     mutating func add<Other: VectorStorage>(other: Other)
 }
 
-extension VectorStorage where Included == Empty, Excluded == Empty {
-    public var included: Included { get { unreachable() } set { unreachable() } }
-    public var excluded: Excluded { get { unreachable() } set { unreachable() } }
+public extension VectorStorage where Included == Empty, Excluded == Empty {
+    var included: Included { get { unreachable() } set { unreachable() } }
+    var excluded: Excluded { get { unreachable() } set { unreachable() } }
 }
 
 public struct Scalar: VectorStorage {
     var value: Double
+
     public init() { value = 0 }
     public mutating func add<Other>(other: Other) where Other : VectorStorage {
         if let other = other as? Self {
@@ -33,7 +34,7 @@ public struct Scalar: VectorStorage {
 }
 public struct Empty: VectorStorage {
     public init() { }
-    public func add<Other>(other: Other) where Other : VectorStorage { }
+    public func add<Other>(other: Other) where Other : VectorStorage { /* Do nothing */ }
 }
 
 public struct Vector<Current: Basis, Included: VectorStorage, Excluded: VectorStorage>: VectorStorage {
