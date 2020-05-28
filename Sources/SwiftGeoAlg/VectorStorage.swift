@@ -15,6 +15,7 @@ public protocol VectorStorage {
 
     init()
     mutating func add<Other: VectorStorage>(other: Other)
+    mutating func subtract<Other: VectorStorage>(other: Other)
 }
 
 public extension VectorStorage where Included == Empty, Excluded == Empty {
@@ -31,10 +32,16 @@ public struct Scalar: VectorStorage {
             value += other.value
         }
     }
+    public mutating func subtract<Other>(other: Other) where Other : VectorStorage {
+        if let other = other as? Self {
+            value -= other.value
+        }
+    }
 }
 public struct Empty: VectorStorage {
     public init() { }
     public func add<Other>(other: Other) where Other : VectorStorage { /* Do nothing */ }
+    public func subtract<Other>(other: Other) where Other : VectorStorage { /* Do nothing */ }
 }
 
 public struct Vector<Current: Basis, Included: VectorStorage, Excluded: VectorStorage>: VectorStorage {
@@ -51,6 +58,14 @@ public struct Vector<Current: Basis, Included: VectorStorage, Excluded: VectorSt
         }
         if Other.Excluded.self != Empty.self {
             excluded.add(other: other.excluded)
+        }
+    }
+    public mutating func subtract<Other>(other: Other) where Other : VectorStorage {
+        if Other.Included.self != Empty.self {
+            included.subtract(other: other.included)
+        }
+        if Other.Excluded.self != Empty.self {
+            excluded.subtract(other: other.excluded)
         }
     }
 }
