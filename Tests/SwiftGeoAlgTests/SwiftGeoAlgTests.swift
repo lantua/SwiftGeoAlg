@@ -47,58 +47,62 @@ final class SwiftGeoAlgTests: XCTestCase {
 
     func testMultiply() {
         do {
-            let a = Vector2_4D.included(.excluded(.included(1.0)))
-            let b = Vector2_4D.excluded(.included(.excluded(.included(1.0))))
-            let c = Vector1_4D.included(1.0)
+            let a = Alg.Vector<Vector2_4D>(storage: .included(.excluded(.included(1.0))))
+            let b = Alg.Vector<Vector2_4D>(storage: .excluded(.included(.excluded(.included(1.0)))))
+            let c = Alg.Vector<Vector1_4D>(storage: .included(1.0))
+
+            /* ⊛•⌋⌊∧ */
 
             do {
-                var result = Vector4_5D()
-                result.add(productOf: a, b, bases: Bases.self, filter: OuterProduct.self)
+                var result = Alg.Vector<Vector4_5D>()
+                result += a ∧ b
                 XCTAssertEqual(result.included.included.included.included.scalar, -1)
             }
             do {
-                var result = Vector4_4D()
-                result.add(productOf: b, a, bases: Bases.self, filter: OuterProduct.self)
+                var result = Alg.Vector<Vector4_4D>()
+                result += b ∧ a
                 XCTAssertEqual(result.included.included.included.included.scalar, -1)
             }
 
             do {
-                var result = Vector4D()
-                result.add(productOf: a, c, bases: Bases.self, filter: OuterProduct.self)
+                var result = Alg.Vector<Vector4D>()
+                result += a ∧ c
                 XCTAssertEqual(result.scalar, 0)
                 result.reset()
-                result.add(productOf: b, c, bases: Bases.self, filter: OuterProduct.self)
+                result += b ∧ c
                 XCTAssertEqual(result.included.included.excluded.included.scalar, 1)
                 result.reset()
-                result.add(productOf: c, b, bases: Bases.self, filter: OuterProduct.self)
+                result += c ∧ b
                 XCTAssertEqual(result.included.included.excluded.included.scalar, 1)
             }
         }
 
         do {
-            let a = Vector1_3D.init(included: 1.0, excluded: .excluded(.included(2.0)))
-            let b = Vector1_1D.included(1.0)
+            let a = Alg.Vector<Vector1_3D>(storage: .init(included: 1.0, excluded: .excluded(.included(2.0))))
+            let b = Alg.Vector<Vector1_1D>(storage: .included(1.0))
 
-            var result = Vector2_3D()
-            result.add(productOf: a, b, bases: Bases.self, filter: OuterProduct.self)
+            var result = Alg.Vector<Vector2_3D>()
+            result += a ∧ b
             XCTAssertEqual(result.included.excluded.included.scalar, -2)
         }
 
         do {
-            let a = Vector1_5D.included(1.0), b = Vector1_5D.excluded(.included(4.0))
-            var result = Vector2_5D()
-            result.add(productOf: a, b, bases: Bases.self, filter: OuterProduct.self)
+            let a = Alg.Vector<Vector1_5D>(storage: .included(1.0))
+            let b = Alg.Vector<Vector1_5D>(storage: .excluded(.included(4.0)))
+            var result = Alg.Vector<Vector2_5D>()
+            result += a ∧ b
             XCTAssertEqual(result.included.included.scalar, 4)
         }
     }
 
     func testPerf() {
-        var result = Vector5_5D()
-        let a = Vector3_5D.included(.included(.included(1.0))), b = Vector2_5D.excluded(.excluded(.excluded(.included(.included(4.0)))))
+        var result = Alg.Vector<Vector5_5D>()
+        let a = Alg.Vector<Vector3_5D>(storage: .included(.included(.included(1.0))))
+        let b = Alg.Vector<Vector2_5D>(storage: .excluded(.excluded(.excluded(.included(.included(4.0))))))
 
         measure {
-            for _ in 0..<10000 {
-                result.foo(productOf: a, b, bases: Bases.self, filter: OuterProduct.self)
+            for _ in 0..<100000 {
+                result += a ∧ b
             }
         }
 
@@ -111,13 +115,11 @@ final class SwiftGeoAlgTests: XCTestCase {
 }
 
 typealias Value = Double
-typealias Bases = BasisLink<PositiveBasis, BasisLink<PositiveBasis, BasisLink<PositiveBasis, BasisLink<PositiveBasis, BasisLink<NegativeBasis, EndBasisChain>>>>>
 
-extension ComputableStorage {
-    //@_specialize(exported: true, where Self == Vector5_5D, L == Vector3_5D, R == Vector2_5D, BC == BasisLink<PositiveBasis, BasisLink<PositiveBasis, BasisLink<PositiveBasis, BasisLink<PositiveBasis, BasisLink<NegativeBasis, EndBasisChain>>>>>, PF == OuterProduct)
-    //@inlinable
-    mutating func foo<L, R, BC, PF>(productOf lhs: L, _ rhs: R, bases: BC.Type, filter: PF.Type) where L: Storage, R: Storage, BC: BasisChain, PF: ProductFilter {
-        add(productOf: lhs, rhs, bases: BC.self, filter: PF.self)
-    }
+enum A: NegativeBasis { public typealias Next = NoBasis }
+enum B: PositiveBasis { public typealias Next = A }
+enum C: PositiveBasis { public typealias Next = B }
+enum D: PositiveBasis { public typealias Next = C }
+enum E: PositiveBasis { public typealias Next = D }
 
-}
+typealias Alg = Algebra<E>
