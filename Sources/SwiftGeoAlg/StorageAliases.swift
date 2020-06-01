@@ -5,65 +5,63 @@
 //  Created by Natchanon Luangsomboon on 29/5/2563 BE.
 //
 
-public typealias Vector0 = Scalar
+public protocol StorageAliases {
+    associatedtype Reduced: StorageAliases
 
-public typealias Vector1D = Mixed<Vector0 , Vector0>
-public typealias Vector2D = Mixed<Vector1D, Vector1D>
-public typealias Vector3D = Mixed<Vector2D, Vector2D>
-public typealias Vector4D = Mixed<Vector3D, Vector3D>
-public typealias Vector5D = Mixed<Vector4D, Vector4D>
-public typealias Vector6D = Mixed<Vector5D, Vector5D>
-public typealias Vector7D = Mixed<Vector6D, Vector6D>
+    typealias Grade0 = Scalar
+    associatedtype Even: Storage = _Even<Self>
+    associatedtype Odd: Storage = _Odd<Self>
+    associatedtype Full: Storage = _Full<Self>
 
-public typealias OddVector0D = Empty
-public typealias OddVector1D = Mixed<EvenVector0D, OddVector0D>
-public typealias OddVector2D = Mixed<EvenVector1D, OddVector1D>
-public typealias OddVector3D = Mixed<EvenVector2D, OddVector2D>
-public typealias OddVector4D = Mixed<EvenVector3D, OddVector3D>
-public typealias OddVector5D = Mixed<EvenVector4D, OddVector4D>
-public typealias OddVector6D = Mixed<EvenVector5D, OddVector5D>
-public typealias OddVector7D = Mixed<EvenVector6D, OddVector6D>
+    associatedtype Grade1: Storage = _Grade1<Self>
+    associatedtype Grade2: Storage = _Grade2<Self>
+    associatedtype Grade3: Storage = _Grade3<Self>
+    associatedtype Grade4: Storage = _Grade4<Self>
+    associatedtype Grade5: Storage = _Grade5<Self>
+}
+public typealias _Even<S: StorageAliases> = Mixed<S.Reduced.Odd, S.Reduced.Even>
+public typealias _Odd<S: StorageAliases> = Mixed<S.Reduced.Even, S.Reduced.Odd>
+public typealias _Full<S: StorageAliases> = Mixed<S.Reduced.Full, S.Reduced.Full>
+public typealias _Grade1<S: StorageAliases> = Mixed<Scalar, S.Reduced.Grade1>
+public typealias _Grade2<S: StorageAliases> = Mixed<S.Reduced.Grade1, S.Reduced.Grade2>
+public typealias _Grade3<S: StorageAliases> = Mixed<S.Reduced.Grade2, S.Reduced.Grade3>
+public typealias _Grade4<S: StorageAliases> = Mixed<S.Reduced.Grade3, S.Reduced.Grade4>
+public typealias _Grade5<S: StorageAliases> = Mixed<S.Reduced.Grade4, S.Reduced.Grade5>
 
-public typealias EvenVector0D = Scalar
-public typealias EvenVector1D = Mixed<OddVector0D, EvenVector0D>
-public typealias EvenVector2D = Mixed<OddVector1D, EvenVector1D>
-public typealias EvenVector3D = Mixed<OddVector2D, EvenVector2D>
-public typealias EvenVector4D = Mixed<OddVector3D, EvenVector3D>
-public typealias EvenVector5D = Mixed<OddVector4D, EvenVector4D>
-public typealias EvenVector6D = Mixed<OddVector5D, EvenVector5D>
-public typealias EvenVector7D = Mixed<OddVector6D, EvenVector6D>
+public enum Storage1D: StorageAliases {
+    public typealias Reduced = Self
+    public typealias Even = Empty
+    public typealias Odd = Scalar
+    public typealias Full = Mixed<Scalar, Scalar>
 
-public typealias Vector1_1D = Mixed<Vector0   , Empty>
+    public typealias Grade1 = Mixed<Grade0          , Empty>
+    public typealias Grade2 = Empty
+    public typealias Grade3 = Empty
+    public typealias Grade4 = Empty
+    public typealias Grade5 = Empty
+}
 
-public typealias Vector1_2D = Mixed<Vector0   , Vector1_1D>
-public typealias Vector2_2D = Mixed<Vector1_1D, Empty>
+public enum Storage2D: StorageAliases {
+    public typealias Reduced = Storage1D
 
-public typealias Vector1_3D = Mixed<Vector0   , Vector1_2D>
-public typealias Vector2_3D = Mixed<Vector1_2D, Vector2_2D>
-public typealias Vector3_3D = Mixed<Vector2_2D, Empty>
+    public typealias Grade3 = Empty
+    public typealias Grade4 = Empty
+    public typealias Grade5 = Empty
+}
 
-public typealias Vector1_4D = Mixed<Vector0   , Vector1_3D>
-public typealias Vector2_4D = Mixed<Vector1_3D, Vector2_3D>
-public typealias Vector3_4D = Mixed<Vector2_3D, Vector3_3D>
-public typealias Vector4_4D = Mixed<Vector3_3D, Empty>
+public enum Storage3D: StorageAliases {
+    public typealias Reduced = Storage2D
 
-public typealias Vector1_5D = Mixed<Vector0   , Vector1_4D>
-public typealias Vector2_5D = Mixed<Vector1_4D, Vector2_4D>
-public typealias Vector3_5D = Mixed<Vector2_4D, Vector3_4D>
-public typealias Vector4_5D = Mixed<Vector3_4D, Vector4_4D>
-public typealias Vector5_5D = Mixed<Vector4_4D, Empty>
+    public typealias Grade4 = Empty
+    public typealias Grade5 = Empty
+}
 
-public typealias Vector1_6D = Mixed<Vector0   , Vector1_5D>
-public typealias Vector2_6D = Mixed<Vector1_5D, Vector2_5D>
-public typealias Vector3_6D = Mixed<Vector2_5D, Vector3_5D>
-public typealias Vector4_6D = Mixed<Vector3_5D, Vector4_5D>
-public typealias Vector5_6D = Mixed<Vector4_5D, Vector5_5D>
-public typealias Vector6_6D = Mixed<Vector5_5D, Empty>
+public enum Storage4D: StorageAliases {
+    public typealias Reduced = Storage3D
 
-public typealias Vector1_7D = Mixed<Vector0   , Vector1_6D>
-public typealias Vector2_7D = Mixed<Vector1_6D, Vector2_6D>
-public typealias Vector3_7D = Mixed<Vector2_6D, Vector3_6D>
-public typealias Vector4_7D = Mixed<Vector3_6D, Vector4_6D>
-public typealias Vector5_7D = Mixed<Vector4_6D, Vector5_6D>
-public typealias Vector6_7D = Mixed<Vector5_6D, Vector6_6D>
-public typealias Vector7_7D = Mixed<Vector6_6D, Empty>
+    public typealias Grade5 = Empty
+}
+
+public enum Storage5D: StorageAliases {
+    public typealias Reduced = Storage4D
+}

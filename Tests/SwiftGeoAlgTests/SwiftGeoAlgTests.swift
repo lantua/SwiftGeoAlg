@@ -7,65 +7,48 @@ final class SwiftGeoAlgTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
 
-        XCTAssertEqual(MemoryLayout<Vector0>.size, MemoryLayout<ScalarValue>.stride * 1)
+        XCTAssertEqual(MemoryLayout<Storage1D.Grade1>.size, MemoryLayout<ScalarValue>.stride * 1)
 
-        XCTAssertEqual(MemoryLayout<Vector1_1D>.size, MemoryLayout<ScalarValue>.stride * 1)
+        XCTAssertEqual(MemoryLayout<Storage2D.Grade1>.size, MemoryLayout<ScalarValue>.stride * 2)
+        XCTAssertEqual(MemoryLayout<Storage2D.Grade2>.size, MemoryLayout<ScalarValue>.stride * 1)
 
-        XCTAssertEqual(MemoryLayout<Vector1_2D>.size, MemoryLayout<ScalarValue>.stride * 2)
-        XCTAssertEqual(MemoryLayout<Vector2_2D>.size, MemoryLayout<ScalarValue>.stride * 1)
+        XCTAssertEqual(MemoryLayout<Storage3D.Grade1>.size, MemoryLayout<ScalarValue>.stride * 3)
+        XCTAssertEqual(MemoryLayout<Storage3D.Grade2>.size, MemoryLayout<ScalarValue>.stride * 3)
+        XCTAssertEqual(MemoryLayout<Storage3D.Grade3>.size, MemoryLayout<ScalarValue>.stride * 1)
 
-        XCTAssertEqual(MemoryLayout<Vector1_3D>.size, MemoryLayout<ScalarValue>.stride * 3)
-        XCTAssertEqual(MemoryLayout<Vector2_3D>.size, MemoryLayout<ScalarValue>.stride * 3)
-        XCTAssertEqual(MemoryLayout<Vector3_3D>.size, MemoryLayout<ScalarValue>.stride * 1)
+        XCTAssertEqual(MemoryLayout<Storage4D.Grade1>.size, MemoryLayout<ScalarValue>.stride * 4)
+        XCTAssertEqual(MemoryLayout<Storage4D.Grade2>.size, MemoryLayout<ScalarValue>.stride * 6)
+        XCTAssertEqual(MemoryLayout<Storage4D.Grade3>.size, MemoryLayout<ScalarValue>.stride * 4)
+        XCTAssertEqual(MemoryLayout<Storage4D.Grade4>.size, MemoryLayout<ScalarValue>.stride * 1)
 
-        XCTAssertEqual(MemoryLayout<Vector1_4D>.size, MemoryLayout<ScalarValue>.stride * 4)
-        XCTAssertEqual(MemoryLayout<Vector2_4D>.size, MemoryLayout<ScalarValue>.stride * 6)
-        XCTAssertEqual(MemoryLayout<Vector3_4D>.size, MemoryLayout<ScalarValue>.stride * 4)
-        XCTAssertEqual(MemoryLayout<Vector4_4D>.size, MemoryLayout<ScalarValue>.stride * 1)
-
-        XCTAssertEqual(MemoryLayout<Vector1_5D>.size, MemoryLayout<ScalarValue>.stride * 5)
-        XCTAssertEqual(MemoryLayout<Vector2_5D>.size, MemoryLayout<ScalarValue>.stride * 10)
-        XCTAssertEqual(MemoryLayout<Vector3_5D>.size, MemoryLayout<ScalarValue>.stride * 10)
-        XCTAssertEqual(MemoryLayout<Vector4_5D>.size, MemoryLayout<ScalarValue>.stride * 5)
-        XCTAssertEqual(MemoryLayout<Vector5_5D>.size, MemoryLayout<ScalarValue>.stride * 1)
-
-        XCTAssertEqual(MemoryLayout<Vector1_6D>.size, MemoryLayout<ScalarValue>.stride * 6)
-        XCTAssertEqual(MemoryLayout<Vector2_6D>.size, MemoryLayout<ScalarValue>.stride * 15)
-        XCTAssertEqual(MemoryLayout<Vector3_6D>.size, MemoryLayout<ScalarValue>.stride * 20)
-        XCTAssertEqual(MemoryLayout<Vector4_6D>.size, MemoryLayout<ScalarValue>.stride * 15)
-        XCTAssertEqual(MemoryLayout<Vector5_6D>.size, MemoryLayout<ScalarValue>.stride * 6)
-        XCTAssertEqual(MemoryLayout<Vector6_6D>.size, MemoryLayout<ScalarValue>.stride * 1)
-
-        XCTAssertEqual(MemoryLayout<Vector1_7D>.size, MemoryLayout<ScalarValue>.stride * 7)
-        XCTAssertEqual(MemoryLayout<Vector2_7D>.size, MemoryLayout<ScalarValue>.stride * 21)
-        XCTAssertEqual(MemoryLayout<Vector3_7D>.size, MemoryLayout<ScalarValue>.stride * 35)
-        XCTAssertEqual(MemoryLayout<Vector4_7D>.size, MemoryLayout<ScalarValue>.stride * 35)
-        XCTAssertEqual(MemoryLayout<Vector5_7D>.size, MemoryLayout<ScalarValue>.stride * 21)
-        XCTAssertEqual(MemoryLayout<Vector6_7D>.size, MemoryLayout<ScalarValue>.stride * 7)
-        XCTAssertEqual(MemoryLayout<Vector7_7D>.size, MemoryLayout<ScalarValue>.stride * 1)
+        XCTAssertEqual(MemoryLayout<Storage5D.Grade1>.size, MemoryLayout<ScalarValue>.stride * 5)
+        XCTAssertEqual(MemoryLayout<Storage5D.Grade2>.size, MemoryLayout<ScalarValue>.stride * 10)
+        XCTAssertEqual(MemoryLayout<Storage5D.Grade3>.size, MemoryLayout<ScalarValue>.stride * 10)
+        XCTAssertEqual(MemoryLayout<Storage5D.Grade4>.size, MemoryLayout<ScalarValue>.stride * 5)
+        XCTAssertEqual(MemoryLayout<Storage5D.Grade5>.size, MemoryLayout<ScalarValue>.stride * 1)
     }
 
     func testMultiply() {
         do {
-            let a = Alg.Vector<Vector2_4D>(storage: .included(.excluded(.included(1.0))))
-            let b = Alg.Vector<Vector2_4D>(storage: .excluded(.included(.excluded(.included(1.0)))))
-            let c = Alg.Vector<Vector1_4D>(storage: .included(1.0))
+            let a = Alg.Vector<Storage4D.Grade2>(storage: .included(.excluded(.included(1.0))))
+            let b = Alg.Vector<Storage4D.Grade2>(storage: .excluded(.included(.excluded(.included(1.0)))))
+            let c = Alg.Vector<Storage4D.Grade1>(storage: .included(1.0))
 
             /* ⊛•⌋⌊∧ */
 
             do {
-                var result = Alg.Vector<Vector4_5D>()
+                var result = Alg.Vector<Storage5D.Grade4>()
                 result += a ∧ b
                 XCTAssertEqual(result.included.included.included.included.scalar, -1)
             }
             do {
-                var result = Alg.Vector<Vector4_4D>()
+                var result = Alg.Vector<Storage4D.Grade4>()
                 result += b ∧ a
                 XCTAssertEqual(result.included.included.included.included.scalar, -1)
             }
 
             do {
-                var result = Alg.Vector<Vector4D>()
+                var result = Alg.Vector<Storage4D.Full>()
                 result += a ∧ c
                 XCTAssertEqual(result.scalar, 0)
                 result.reset()
@@ -78,27 +61,27 @@ final class SwiftGeoAlgTests: XCTestCase {
         }
 
         do {
-            let a = Alg.Vector<Vector1_3D>(storage: .init(included: 1.0, excluded: .excluded(.included(2.0))))
-            let b = Alg.Vector<Vector1_1D>(storage: .included(1.0))
+            let a = Alg.Vector<Storage3D.Grade1>(storage: .init(included: 1.0, excluded: .excluded(.included(2.0))))
+            let b = Alg.Vector<Storage1D.Grade1>(storage: .included(1.0))
 
-            var result = Alg.Vector<Vector2_3D>()
+            var result = Alg.Vector<Storage3D.Grade2>()
             result += a ∧ b
             XCTAssertEqual(result.included.excluded.included.scalar, -2)
         }
 
         do {
-            let a = Alg.Vector<Vector1_5D>(storage: .included(1.0))
-            let b = Alg.Vector<Vector1_5D>(storage: .excluded(.included(4.0)))
-            var result = Alg.Vector<Vector2_5D>()
+            let a = Alg.Vector<Storage5D.Grade1>(storage: .included(1.0))
+            let b = Alg.Vector<Storage5D.Grade1>(storage: .excluded(.included(4.0)))
+            var result = Alg.Vector<Storage5D.Grade2>()
             result += a ∧ b
             XCTAssertEqual(result.included.included.scalar, 4)
         }
     }
 
     func testPerf() {
-        var result = Alg.Vector<Vector5_5D>()
-        let a = Alg.Vector<Vector3_5D>(storage: .included(.included(.included(1.0))))
-        let b = Alg.Vector<Vector2_5D>(storage: .excluded(.excluded(.excluded(.included(.included(4.0))))))
+        var result = Alg.Vector<Storage5D.Grade5>()
+        let a = Alg.Vector<Storage5D.Grade3>(storage: .included(.included(.included(1.0))))
+        let b = Alg.Vector<Storage5D.Grade2>(storage: .excluded(.excluded(.excluded(.included(.included(4.0))))))
 
         measure {
             for _ in 0..<100000 {
