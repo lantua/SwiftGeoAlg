@@ -23,26 +23,26 @@ infix operator ⌊: InnerMultiplicationPrecedence
 infix operator ∧: OuterMultiplicationPrecedence
 
 @inlinable public
-func ⊛<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2> where BC: Basis, S1: Storage, S2: Storage {
-    .init(type: .scalar, storage1: lhs.storage, storage2: rhs.storage)
+func ⊛<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, ScalarProduct> where BC: Basis, S1: Storage, S2: Storage {
+    .init(storage1: lhs.storage, storage2: rhs.storage)
 }
 
 @inlinable public
-func •<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2> where BC: Basis, S1: Storage, S2: Storage {
-    .init(type: .fatDot, storage1: lhs.storage, storage2: rhs.storage)
+func •<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, FatDotProduct> where BC: Basis, S1: Storage, S2: Storage {
+    .init(storage1: lhs.storage, storage2: rhs.storage)
 }
 
 @inlinable public
-func ⌋<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2> where BC: Basis, S1: Storage, S2: Storage {
-    .init(type: .leftInner, storage1: lhs.storage, storage2: rhs.storage)
+func ⌋<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, LeftInnerProduct> where BC: Basis, S1: Storage, S2: Storage {
+    .init(storage1: lhs.storage, storage2: rhs.storage)
 }
 
 @inlinable public
-func ⌊<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S2, S1> where BC: Basis, S1: Storage, S2: Storage {
-    .init(type: .leftInner, storage1: rhs.storage, storage2: lhs.storage)
+func ⌊<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S2, S1, LeftInnerProduct> where BC: Basis, S1: Storage, S2: Storage {
+    .init(storage1: rhs.storage, storage2: lhs.storage)
 }
 
 @inlinable public
-func ∧<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2> where BC: Basis, S1: Storage, S2: Storage {
-    .init(type: .outer, storage1: lhs.storage, storage2: rhs.storage)
+func ∧<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, OuterProduct> where BC: Basis, S1: Storage, S2: Storage {
+    .init(storage1: lhs.storage, storage2: rhs.storage)
 }

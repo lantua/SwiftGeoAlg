@@ -41,7 +41,7 @@ extension Storage {
     }
 
     @inlinable mutating
-    func _add<L, R, BC, Alt, Flp, PF>(productOf lhs: L, _ rhs: R, bc: BC.Type, alt: Alt.Type, flip: Flp.Type, filter: PF.Type) where L : Storage, R : Storage, BC : BasisChain, Alt : MetaBool, Flp : MetaBool, PF : ProductFilter {
+    func _add<L, R, BC, Alt, Flp, PF>(productOf lhs: L, _ rhs: R, bc: BC.Type, alt: Alt.Type, flip: Flp.Type, filter: PF.Type) where L: Storage, R: Storage, BC: BasisChain, Alt: MetaBool, Flp: MetaBool, PF: ProductFilter {
         guard !(self is Empty) else { return }
         guard PF.self != FilterReject.self, !(lhs is Empty), !(rhs is Empty) else { return }
 

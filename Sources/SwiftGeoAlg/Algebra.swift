@@ -37,11 +37,6 @@ public enum Positive: BasisSign { }
 public enum Negative: BasisSign { }
 public enum Zero: BasisSign { }
 
-@usableFromInline
-enum ProductType {
-    case outer, leftInner, fatDot, scalar
-}
-
 public enum Algebra<Bases: Basis> {
     public struct Vector<S: Storage> {
         @usableFromInline var storage: S
@@ -53,12 +48,10 @@ public enum Algebra<Bases: Basis> {
         public var excluded: S.Excluded { storage.excluded }
         public var scalar: ScalarValue { storage.scalar }
     }
-    public struct Product<S1: Storage, S2: Storage> {
-        @usableFromInline var type: ProductType, storage1: S1, storage2: S2
+    public struct Product<S1: Storage, S2: Storage, PF: ProductFilter> {
+        @usableFromInline var storage1: S1, storage2: S2
 
-        @inlinable
-        init(type: ProductType, storage1: S1, storage2: S2) {
-            self.type = type
+        @inlinable init(storage1: S1, storage2: S2) {
             self.storage1 = storage1
             self.storage2 = storage2
         }
@@ -66,21 +59,16 @@ public enum Algebra<Bases: Basis> {
 }
 
 public extension Algebra.Vector {
-    @inlinable static func +=<Other: Storage>(lhs: inout Self, rhs: Algebra.Vector<Other>) {
+    @inlinable static func +=<Other>(lhs: inout Self, rhs: Algebra.Vector<Other>) where Other: Storage {
         lhs.storage.add(rhs.storage)
     }
 
-    @inlinable static func -=<Other: Storage>(lhs: inout Self, rhs: Algebra.Vector<Other>) {
+    @inlinable static func -=<Other>(lhs: inout Self, rhs: Algebra.Vector<Other>) where Other: Storage {
         lhs.storage.subtract(rhs.storage)
     }
 
-    @inlinable static func +=<O1: Storage, O2: Storage>(lhs: inout Self, rhs: Algebra.Product<O1, O2>) {
-        switch rhs.type {
-        case .outer: lhs.storage.add(productOf: rhs.storage1, rhs.storage2, bases: Bases.Chain.self, filter: OuterProduct.self)
-        case .leftInner: lhs.storage.add(productOf: rhs.storage1, rhs.storage2, bases: Bases.Chain.self, filter: LeftInnerProduct.self)
-        case .scalar: lhs.storage.add(productOf: rhs.storage1, rhs.storage2, bases: Bases.Chain.self, filter: ScalarProduct.self)
-        case .fatDot: lhs.storage.add(productOf: rhs.storage1, rhs.storage2, bases: Bases.Chain.self, filter: FatDotProduct.self)
-        }
+    @inlinable static func +=<O1, O2, PF>(lhs: inout Self, rhs: Algebra.Product<O1, O2, PF>) where O1: Storage, O2: Storage, PF: ProductFilter {
+        lhs.storage.add(productOf: rhs.storage1, rhs.storage2, bases: Bases.Chain.self, filter: PF.self)
     }
 }
 
