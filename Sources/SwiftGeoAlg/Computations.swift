@@ -42,35 +42,37 @@ extension Storage {
 
     @inlinable mutating
     func _add<L, R, BC, Alt, Flp, PF>(productOf lhs: L, _ rhs: R, bc: BC.Type, alt: Alt.Type, flip: Flp.Type, filter: PF.Type) where L: Storage, R: Storage, BC: BasisChain, Alt: MetaBool, Flp: MetaBool, PF: ProductFilter {
-        guard !(self is Empty) else { return }
-        guard PF.self != FilterReject.self, !(lhs is Empty), !(rhs is Empty) else { return }
+        guard PF.self != FilterReject.self, !(self is Empty), !(lhs is Empty), !(rhs is Empty) else { return }
 
         // Toggle Alt if r.included
         // Toggle Flp if Alt && lhs.included
         // Toggle Flp *again* if lhs.included, rhs.included and NegativeBasis
-        if BC.self != EndBasisChain.self {
-            if Alt.self == True.self {
-                if BC.Current.self == Positive.self {
-                    excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.Toggle.self, filter: PF.Both.self)
-                } else if BC.Current.self == Negative.self {
-                    excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self, filter: PF.Both.self)
-                }
-                included._add(productOf: lhs.included, rhs.excluded, bc: BC.Tail.self, alt: Alt.self, flip: Flp.Toggle.self, filter: PF.Left.self)
+        guard BC.self != EndBasisChain.self else {
+            if Flp.self == True.self {
+                scalar -= lhs.scalar * rhs.scalar
             } else {
-                if BC.Current.self == Positive.self {
-                    excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self, filter: PF.Both.self)
-                } else if BC.Current.self == Negative.self {
-                    excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.Toggle.self, filter: PF.Both.self)
-                }
-                included._add(productOf: lhs.included, rhs.excluded, bc: BC.Tail.self, alt: Alt.self, flip: Flp.self, filter: PF.Left.self)
+                scalar += lhs.scalar * rhs.scalar
             }
-
-            included._add(productOf: lhs.excluded, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self, filter: PF.Right.self)
-            excluded._add(productOf: lhs.excluded, rhs.excluded, bc: BC.Tail.self, alt: Alt.self, flip: Flp.self, filter: PF.self)
-        } else if Flp.self == True.self {
-            scalar -= lhs.scalar * rhs.scalar
-        } else {
-            scalar += lhs.scalar * rhs.scalar
+            return
         }
+
+        if Alt.self == True.self {
+            if BC.Current.self == Positive.self {
+                excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.Toggle.self, filter: PF.Both.self)
+            } else if BC.Current.self == Negative.self {
+                excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self, filter: PF.Both.self)
+            }
+            included._add(productOf: lhs.included, rhs.excluded, bc: BC.Tail.self, alt: Alt.self, flip: Flp.Toggle.self, filter: PF.Left.self)
+        } else {
+            if BC.Current.self == Positive.self {
+                excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self, filter: PF.Both.self)
+            } else if BC.Current.self == Negative.self {
+                excluded._add(productOf: lhs.included, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.Toggle.self, filter: PF.Both.self)
+            }
+            included._add(productOf: lhs.included, rhs.excluded, bc: BC.Tail.self, alt: Alt.self, flip: Flp.self, filter: PF.Left.self)
+        }
+
+        included._add(productOf: lhs.excluded, rhs.included, bc: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self, filter: PF.Right.self)
+        excluded._add(productOf: lhs.excluded, rhs.excluded, bc: BC.Tail.self, alt: Alt.self, flip: Flp.self, filter: PF.self)
     }
 }
