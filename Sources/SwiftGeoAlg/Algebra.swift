@@ -30,11 +30,9 @@ public extension Algebra.Vector {
     @inlinable static func +=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
         lhs.storage.add(rhs.storage)
     }
-
     @inlinable static func -=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
         lhs.storage.subtract(rhs.storage)
     }
-
 }
 
 public extension Algebra.Product {

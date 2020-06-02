@@ -7,24 +7,16 @@
 
 extension Storage {
     @inlinable mutating func add<O>(_ other: O) where O: Storage {
-        guard !(self is Empty) else { return }
+        guard !(self is Empty), !(other is Empty) else { return }
 
-        if Included.self != Empty.self {
-            included.add(other.included)
-        }
-        if Excluded.self != Empty.self {
-            excluded.add(other.excluded)
-        }
+        included.add(other.included)
+        excluded.add(other.excluded)
     }
 
     @inlinable mutating func subtract<O>(_ other: O) where O: Storage {
-        guard !(self is Empty) else { return }
-        
-        if Included.self != Empty.self {
-            included.subtract(other.included)
-        }
-        if Excluded.self != Empty.self {
-            excluded.subtract(other.excluded)
-        }
+        guard !(self is Empty), !(other is Empty) else { return }
+
+        included.subtract(other.included)
+        excluded.subtract(other.excluded)
     }
 }
