@@ -5,50 +5,18 @@
 //  Created by Natchanon Luangsomboon on 28/5/2563 BE.
 //
 
-import Foundation
-
-public protocol Basis {
-    associatedtype Next: Basis
-    associatedtype Sign: BasisSign
-    associatedtype Chain: BasisChain = _BasisChain<Self>
-}
-public typealias _BasisChain<B: Basis> = MidBasisChain<B.Sign, B.Next.Chain>
-public protocol PositiveBasis: Basis where Sign == Positive { }
-public protocol NegativeBasis: Basis where Sign == Negative { }
-public protocol ZeroBasis: Basis where Sign == Zero { }
-
-public enum NoBasis: ZeroBasis {
-    public typealias Next = Self
-    public typealias Chain = EndBasisChain
-}
-
-public protocol BasisChain {
-    associatedtype Tail: BasisChain
-    associatedtype Current: BasisSign
-}
-public enum EndBasisChain: BasisChain {
-    public typealias Tail = Self
-    public typealias Current = Zero
-}
-public enum MidBasisChain<Current: BasisSign, Tail: BasisChain>: BasisChain { }
-
-public protocol BasisSign { }
-public enum Positive: BasisSign { }
-public enum Negative: BasisSign { }
-public enum Zero: BasisSign { }
-
 public enum Algebra<Bases: Basis> {
     public struct Vector<S: Storage> {
         @usableFromInline var storage: S
 
-        public init(storage: S = .init()) { self.storage = storage }
+        @inlinable public init(storage: S = .init()) { self.storage = storage }
 
         #warning("Todo: Redo accessor")
         public var included: S.Included { storage.included }
         public var excluded: S.Excluded { storage.excluded }
         public var scalar: ScalarValue { storage.scalar }
     }
-    public struct Product<S1: Storage, S2: Storage, PF: ProductFilter> {
+    public struct Product<S1: Storage, S2: Storage, PF: Multiplier> {
         @usableFromInline var storage1: S1, storage2: S2
 
         @inlinable init(storage1: S1, storage2: S2) {
@@ -59,16 +27,19 @@ public enum Algebra<Bases: Basis> {
 }
 
 public extension Algebra.Vector {
-    @inlinable static func +=<Other>(lhs: inout Self, rhs: Algebra.Vector<Other>) where Other: Storage {
+    @inlinable static func +=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
         lhs.storage.add(rhs.storage)
     }
 
-    @inlinable static func -=<Other>(lhs: inout Self, rhs: Algebra.Vector<Other>) where Other: Storage {
+    @inlinable static func -=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
         lhs.storage.subtract(rhs.storage)
     }
 
-    @inlinable static func +=<O1, O2, PF>(lhs: inout Self, rhs: Algebra.Product<O1, O2, PF>) where O1: Storage, O2: Storage, PF: ProductFilter {
-        lhs.storage.add(productOf: rhs.storage1, rhs.storage2, bases: Bases.Chain.self, filter: PF.self)
+}
+
+public extension Algebra.Product {
+    @inlinable static func +=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
+        PF.multiply(rhs.storage1, rhs.storage2, into: &lhs.storage, bases: Bases.Chain.self)
     }
 }
 

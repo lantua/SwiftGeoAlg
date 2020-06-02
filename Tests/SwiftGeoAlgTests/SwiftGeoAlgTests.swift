@@ -84,7 +84,7 @@ final class SwiftGeoAlgTests: XCTestCase {
         let b = Alg.Vector<Storage5D.Grade2>(storage: .excluded(.excluded(.excluded(.included(.included(4.0))))))
 
         measure {
-            for _ in 0..<100000 {
+            for _ in 0..<500000 {
                 result += a ∧ b
             }
         }

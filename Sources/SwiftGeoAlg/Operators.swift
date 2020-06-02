@@ -22,27 +22,24 @@ infix operator ⌋: InnerMultiplicationPrecedence
 infix operator ⌊: InnerMultiplicationPrecedence
 infix operator ∧: OuterMultiplicationPrecedence
 
-@inlinable public
-func ⊛<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, ScalarProduct> where BC: Basis, S1: Storage, S2: Storage {
-    .init(storage1: lhs.storage, storage2: rhs.storage)
+public protocol Multiplier {
+    static func multiply<L, R, O, BC>(_ lhs: L, _ rhs: R, into out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain
 }
 
-@inlinable public
-func •<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, FatDotProduct> where BC: Basis, S1: Storage, S2: Storage {
-    .init(storage1: lhs.storage, storage2: rhs.storage)
-}
-
-@inlinable public
-func ⌋<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, LeftInnerProduct> where BC: Basis, S1: Storage, S2: Storage {
-    .init(storage1: lhs.storage, storage2: rhs.storage)
-}
-
-@inlinable public
-func ⌊<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S2, S1, LeftInnerProduct> where BC: Basis, S1: Storage, S2: Storage {
-    .init(storage1: rhs.storage, storage2: lhs.storage)
-}
-
-@inlinable public
-func ∧<BC, S1, S2>(lhs: Algebra<BC>.Vector<S1>, rhs: Algebra<BC>.Vector<S2>) -> Algebra<BC>.Product<S1, S2, OuterProduct> where BC: Basis, S1: Storage, S2: Storage {
-    .init(storage1: lhs.storage, storage2: rhs.storage)
+public extension Algebra.Vector {
+    @inlinable static func ⊛<O>(lhs: Self, rhs: Algebra.Vector<O>) -> Algebra.Product<S, O, ScalarProduct> where O: Storage {
+        .init(storage1: lhs.storage, storage2: rhs.storage)
+    }
+    @inlinable static func •<O>(lhs: Self, rhs: Algebra.Vector<O>) -> Algebra.Product<S, O, FatDotProduct> where O: Storage {
+        .init(storage1: lhs.storage, storage2: rhs.storage)
+    }
+    @inlinable static func ⌋<O>(lhs: Self, rhs: Algebra.Vector<O>) -> Algebra.Product<S, O, LeftInnerProduct> where O: Storage {
+        .init(storage1: lhs.storage, storage2: rhs.storage)
+    }
+    @inlinable static func ⌊<O>(lhs: Self, rhs: Algebra.Vector<O>) -> Algebra.Product<O, S, LeftInnerProduct> where O: Storage {
+        .init(storage1: rhs.storage, storage2: lhs.storage)
+    }
+    @inlinable static func ∧<O>(lhs: Self, rhs: Algebra.Vector<O>) -> Algebra.Product<S, O, OuterProduct> where O: Storage {
+        .init(storage1: lhs.storage, storage2: rhs.storage)
+    }
 }

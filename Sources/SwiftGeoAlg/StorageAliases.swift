@@ -34,7 +34,7 @@ public enum Storage1D: StorageAliases {
     public typealias Odd = Scalar
     public typealias Full = Mixed<Scalar, Scalar>
 
-    public typealias Grade1 = Mixed<Grade0          , Empty>
+    public typealias Grade1 = Mixed<Grade0, Empty>
     public typealias Grade2 = Empty
     public typealias Grade3 = Empty
     public typealias Grade4 = Empty
