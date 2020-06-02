@@ -6,15 +6,25 @@
 //
 
 /**
- * - Requires: The `Next` chain eventually reach `NoBasis`.
  * - Note: Conformer can use `PositiveBasis`, `NegativeBasis`, or `ZeroBasis`, to help facilitate conformance.
  * - Remark:
  *     Most underlying structures treat the `Basis` chain with the same positive/negative/zero order as the same type.
  *     You can arrange bases to have similar tail pattern (e.g. `PPNNZEnd` and `NNZEnd`) to increase the chance of code reuse.
  */
 public protocol Basis {
+    /**
+     * Next basis in the basis chain.
+     * - Requires: The `Next` chain eventually reach `NoBasis`.
+     */
     associatedtype Next: Basis
+
+    /**
+     * The sign of this basis.
+     * - Requires: One of `Positive`, `Negative`, and `Zero`.
+     */
     associatedtype Sign: BasisSign
+
+    /// - Attention: Internal use, do not override this.
     associatedtype Chain: BasisChain = _Chain<Self>
 }
 public typealias _Chain<B: Basis> = MidBasisChain<B.Sign, B.Next.Chain>
@@ -33,11 +43,11 @@ public enum NoBasis: ZeroBasis {
 }
 
 public protocol BasisChain {
+    associatedtype Sign: BasisSign
     associatedtype Tail: BasisChain
-    associatedtype Current: BasisSign
 }
 public enum EndBasisChain: BasisChain {
+    public typealias Sign = Zero
     public typealias Tail = Self
-    public typealias Current = Zero
 }
-public enum MidBasisChain<Current: BasisSign, Tail: BasisChain>: BasisChain { }
+public enum MidBasisChain<Sign: BasisSign, Tail: BasisChain>: BasisChain { }

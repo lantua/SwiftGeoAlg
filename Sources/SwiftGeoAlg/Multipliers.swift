@@ -66,15 +66,15 @@ extension PrimaryMultiplier {
     }
     @inlinable static func multiply<L, R, O, BC, Alt, Flp>(included lhs: L, included rhs: R, into out: inout O, bases: BC.Type, alt: Alt.Type, flip: Flp.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain, Alt: MetaBool, Flp: MetaBool {
         if Alt.self == True.self {
-            if BC.Current.self == Positive.self {
+            if BC.Sign.self == Positive.self {
                 multiply(lhs.included, rhs.included, into: &out.excluded, bases: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.Toggle.self)
-            } else if BC.Current.self == Negative.self {
+            } else if BC.Sign.self == Negative.self {
                 multiply(lhs.included, rhs.included, into: &out.excluded, bases: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self)
             }
         } else {
-            if BC.Current.self == Positive.self {
+            if BC.Sign.self == Positive.self {
                 multiply(lhs.included, rhs.included, into: &out.excluded, bases: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.self)
-            } else if BC.Current.self == Negative.self {
+            } else if BC.Sign.self == Negative.self {
                 multiply(lhs.included, rhs.included, into: &out.excluded, bases: BC.Tail.self, alt: Alt.Toggle.self, flip: Flp.Toggle.self)
             }
         }
