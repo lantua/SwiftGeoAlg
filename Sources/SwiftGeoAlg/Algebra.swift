@@ -37,7 +37,10 @@ public extension Algebra.Vector {
 
 public extension Algebra.Product {
     @inlinable static func +=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
-        PF.multiply(rhs.storage1, rhs.storage2, into: &lhs.storage, bases: Bases.Chain.self)
+        PF.add(productOf: rhs.storage1, rhs.storage2, to: &lhs.storage, bases: Bases.Chain.self)
+    }
+    @inlinable static func -=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
+        PF.subtract(productOf: rhs.storage1, rhs.storage2, from: &lhs.storage, bases: Bases.Chain.self)
     }
 }
 

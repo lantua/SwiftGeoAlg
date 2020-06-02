@@ -23,7 +23,8 @@ infix operator ⌊: InnerMultiplicationPrecedence
 infix operator ∧: OuterMultiplicationPrecedence
 
 public protocol Multiplier {
-    static func multiply<L, R, O, BC>(_ lhs: L, _ rhs: R, into out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain
+    static func add<L, R, O, BC>(productOf lhs: L, _ rhs: R, to out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain
+    static func subtract<L, R, O, BC>(productOf lhs: L, _ rhs: R, from out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain
 }
 
 public extension Algebra.Vector {

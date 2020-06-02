@@ -36,8 +36,11 @@ public enum ScalarProduct: PrimaryMultiplier {
 }
 
 extension PrimaryMultiplier {
-    @inlinable public static func multiply<L, R, O, BC>(_ lhs: L, _ rhs: R, into out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain {
+    @inlinable public static func add<L, R, O, BC>(productOf lhs: L, _ rhs: R, to out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain {
         multiply(lhs, rhs, into: &out, bases: BC.self, alt: False.self, flip: False.self)
+    }
+    @inlinable public static func subtract<L, R, O, BC>(productOf lhs: L, _ rhs: R, from out: inout O, bases: BC.Type) where L: Storage, R: Storage, O: Storage, BC: BasisChain {
+        multiply(lhs, rhs, into: &out, bases: BC.self, alt: False.self, flip: True.self)
     }
 
     // Toggle Alt if r.included
