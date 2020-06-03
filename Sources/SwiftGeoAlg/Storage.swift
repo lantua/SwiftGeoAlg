@@ -13,6 +13,9 @@ public protocol ScalarProtocol {
 extension Never: ScalarProtocol {
     public var value: ScalarValue { get { unreachable() } set { } }
 }
+extension ScalarValue: ScalarProtocol {
+    @inlinable public var value: ScalarValue { get { self } set { self = newValue } }
+}
 
 public protocol Storage {
     associatedtype Included: Storage
@@ -40,13 +43,12 @@ public struct Empty: Storage {
     public var scalar: Never { get { unreachable() } set { } }
 }
 
-public struct Scalar: Storage, ScalarProtocol {
-    public var value: ScalarValue
-    @inlinable public init() { value = .init() }
+public struct Scalar: Storage {
+    @inlinable public init() { scalar = .init() }
 
     @inlinable public var included: Empty { get { .init() } set { } }
     @inlinable public var excluded: Self { get { self } set { self = newValue } }
-    @inlinable public var scalar: Self { get { self } set { self = newValue } }
+    public var scalar: ScalarValue
 }
 
 public struct Mixed<Included: Storage, Excluded: Storage>: Storage {
