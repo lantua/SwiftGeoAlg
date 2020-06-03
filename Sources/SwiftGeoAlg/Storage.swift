@@ -27,9 +27,9 @@ public extension Mixed {
 public struct Empty: Storage {
     @inlinable public init() { }
 
-    public var included: Empty { get { unreachable() } set { } }
-    public var excluded: Empty { get { unreachable() } set { } }
-    @inlinable public var scalar: ScalarValue { get { .zero } set { } }
+    @inlinable public var included: Empty { get { unreachable() } set { } }
+    @inlinable public var excluded: Empty { get { unreachable() } set { } }
+    @inlinable public var scalar: ScalarValue { get { unreachable() } set { } }
 }
 
 public struct Scalar: Storage {

@@ -5,10 +5,9 @@
 //  Created by Natchanon Luangsomboon on 28/5/2563 BE.
 //
 
-func unreachable(file: StaticString = #file, line: UInt = #line) -> Never {
+@usableFromInline func unreachable(file: StaticString = #file, line: UInt = #line) -> Never {
     fatalError("Unreachable. If you receive this message, please file bug report.", file: file, line: line)
 }
-
 
 @usableFromInline protocol MetaBool { associatedtype Toggle: MetaBool }
 @usableFromInline enum True: MetaBool { public typealias Toggle = False }
