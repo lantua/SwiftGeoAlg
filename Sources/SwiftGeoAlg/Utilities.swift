@@ -21,7 +21,7 @@ extension Mixed: ByteZeroable where Included: ByteZeroable, Excluded: ByteZeroab
 // MARK: ExpressibleByFloatLiteral
 
 extension Scalar: ExpressibleByFloatLiteral {
-    @inlinable public init(floatLiteral value: ScalarValue.FloatLiteralType) { scalar = .init(floatLiteral: value) }
+    @inlinable public init(floatLiteral value: ScalarValue.FloatLiteralType) { self.value = .init(floatLiteral: value) }
 }
 extension Mixed where Excluded: ExpressibleByFloatLiteral {
     @inlinable public init(floatLiteral value: Excluded.FloatLiteralType) { excluded = .init(floatLiteral: value) }

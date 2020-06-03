@@ -12,9 +12,9 @@ public enum Algebra<Bases: Basis> {
         @inlinable public init(storage: S = .init()) { self.storage = storage }
 
         #warning("Todo: Redo accessor")
-        public var included: S.Included { storage.included }
-        public var excluded: S.Excluded { storage.excluded }
-        public var scalar: ScalarValue { storage.scalar }
+        public var included: Algebra<Bases.Next>.Vector<S.Included> { .init(storage: storage.included) }
+        public var excluded: Algebra<Bases.Next>.Vector<S.Excluded> { .init(storage: storage.excluded) }
+        public var scalar: ScalarValue { storage.scalar.value }
     }
     public struct Product<S1: Storage, S2: Storage, PF: Multiplier> {
         @usableFromInline var storage1: S1, storage2: S2

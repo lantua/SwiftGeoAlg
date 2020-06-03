@@ -48,13 +48,16 @@ extension PrimaryMultiplier {
     // Toggle Flp *again* if lhs.included, rhs.included and NegativeBasis
 
     @inlinable static func multiply<L, R, O, B, Inv, Flp>(_ lhs: L, _ rhs: R, into out: inout O, bases: B.Type, involute: Inv.Type, flip: Flp.Type) where L: Storage, R: Storage, O: Storage, B: BasisChain, Inv: MetaBool, Flp: MetaBool {
+        // Unnecessary on optimized build, but would help on debug build.
         guard !(out is Empty), !(lhs is Empty), !(rhs is Empty) else { return }
 
         guard B.self != EndBasisChain.self else {
-            if Flp.self == True.self {
-                out.scalar -= lhs.scalar * rhs.scalar
-            } else {
-                out.scalar += lhs.scalar * rhs.scalar
+            if O.ScalarType.self != Never.self, L.ScalarType.self != Never.self, R.ScalarType.self != Never.self {
+                if Flp.self == True.self {
+                    out.scalar.value -= lhs.scalar.value * rhs.scalar.value
+                } else {
+                    out.scalar.value += lhs.scalar.value * rhs.scalar.value
+                }
             }
             return
         }

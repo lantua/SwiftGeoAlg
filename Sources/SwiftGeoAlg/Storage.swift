@@ -7,15 +7,23 @@
 
 public typealias ScalarValue = Double
 
+public protocol ScalarProtocol {
+    var value: ScalarValue { get set }
+}
+extension Never: ScalarProtocol {
+    public var value: ScalarValue { get { unreachable() } set { } }
+}
+
 public protocol Storage {
     associatedtype Included: Storage
     associatedtype Excluded: Storage
+    associatedtype ScalarType: ScalarProtocol
 
     init()
 
     var included: Included { get set }
     var excluded: Excluded { get set }
-    var scalar: ScalarValue { get set }
+    var scalar: ScalarType { get set }
 }
 
 #warning("Todo: Remove this")
@@ -27,17 +35,18 @@ public extension Mixed {
 public struct Empty: Storage {
     @inlinable public init() { }
 
-    public var included: Empty { get { unreachable() } set { } }
-    public var excluded: Empty { get { unreachable() } set { } }
-    @inlinable public var scalar: ScalarValue { get { .zero } set { } }
+    @inlinable public var included: Empty { get { self } set { } }
+    @inlinable public var excluded: Empty { get { self } set { } }
+    public var scalar: Never { get { unreachable() } set { } }
 }
 
-public struct Scalar: Storage {
-    @inlinable public init() { scalar = .init() }
+public struct Scalar: Storage, ScalarProtocol {
+    public var value: ScalarValue
+    @inlinable public init() { value = .init() }
 
     @inlinable public var included: Empty { get { .init() } set { } }
     @inlinable public var excluded: Self { get { self } set { self = newValue } }
-    public var scalar: ScalarValue
+    @inlinable public var scalar: Self { get { self } set { self = newValue } }
 }
 
 public struct Mixed<Included: Storage, Excluded: Storage>: Storage {
@@ -48,5 +57,5 @@ public struct Mixed<Included: Storage, Excluded: Storage>: Storage {
     }
 
     public var included: Included = .init(), excluded: Excluded
-    @inlinable public var scalar: ScalarValue { get { excluded.scalar } set { excluded.scalar = newValue } }
+    @inlinable public var scalar: Excluded.ScalarType { get { excluded.scalar } set { excluded.scalar = newValue } }
 }
