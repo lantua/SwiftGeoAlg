@@ -50,7 +50,7 @@ final class SwiftGeoAlgTests: XCTestCase {
             do {
                 var result = Alg.Vector<Storage4D.Full>()
                 result += a ∧ c
-                XCTAssertEqual(result.scalar, 0)
+                XCTAssertEqual(result.excluded.excluded.excluded.excluded.scalar, 0)
                 result.reset()
                 result += b ∧ c
                 XCTAssertEqual(result.included.included.excluded.included.scalar, 1)
