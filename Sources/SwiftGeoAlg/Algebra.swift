@@ -16,14 +16,6 @@ public enum Algebra<Bases: Basis> {
         public var excluded: Algebra<Bases.Next>.Vector<S.Excluded> { .init(storage: storage.excluded) }
         public var scalar: ScalarValue { storage.scalar.value }
     }
-    public struct Product<S1: Storage, S2: Storage, PF: Multiplier> {
-        @usableFromInline var storage1: S1, storage2: S2
-
-        @inlinable init(storage1: S1, storage2: S2) {
-            self.storage1 = storage1
-            self.storage2 = storage2
-        }
-    }
 }
 
 public extension Algebra.Vector {
@@ -32,15 +24,6 @@ public extension Algebra.Vector {
     }
     @inlinable static func -=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
         lhs.storage.subtract(rhs.storage)
-    }
-}
-
-public extension Algebra.Product {
-    @inlinable static func +=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
-        PF.add(productOf: rhs.storage1, rhs.storage2, to: &lhs.storage, bases: Bases.Chain.self)
-    }
-    @inlinable static func -=<L>(lhs: inout Algebra.Vector<L>, rhs: Self) where L: Storage {
-        PF.subtract(productOf: rhs.storage1, rhs.storage2, from: &lhs.storage, bases: Bases.Chain.self)
     }
 }
 

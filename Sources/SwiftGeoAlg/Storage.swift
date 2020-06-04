@@ -20,6 +20,7 @@ extension ScalarValue: ScalarProtocol {
 public protocol Storage {
     associatedtype Included: Storage = Empty
     associatedtype Excluded: Storage = Empty
+    associatedtype Swap: Storage
     associatedtype ScalarType: ScalarProtocol = Never
 
     init()
@@ -39,23 +40,40 @@ extension Storage where Excluded == Empty {
 }
 
 #warning("Todo: Remove this")
-public extension Mixed {
+public extension MixedIE {
+    @inlinable static func included(_ included: Included) -> Self { .init(included: included, excluded: .init()) }
+    @inlinable static func excluded(_ excluded: Excluded) -> Self { .init(included: .init(), excluded: excluded) }
+}
+public extension MixedEI {
     @inlinable static func included(_ included: Included) -> Self { .init(included: included, excluded: .init()) }
     @inlinable static func excluded(_ excluded: Excluded) -> Self { .init(included: .init(), excluded: excluded) }
 }
 
 public struct Empty: Storage {
+    public typealias Swap = Self
+
     @inlinable public init() { }
 }
-
 public struct Scalar: Storage {
+    public typealias Swap = PseudoScalar
+
     @inlinable public init() { scalar = .init() }
 
     @inlinable public var excluded: Self { get { self } set { self = newValue } }
     public var scalar: ScalarValue
 }
+public struct PseudoScalar: Storage {
+    public typealias Swap = Scalar
 
-public struct Mixed<Included: Storage, Excluded: Storage>: Storage {
+    @inlinable public init() { scalar = .init() }
+
+    @inlinable public var included: Self { get { self } set { self = newValue } }
+    public var scalar: ScalarValue
+}
+
+public struct MixedIE<Included: Storage, Excluded: Storage>: Storage {
+    public typealias Swap = MixedEI<Included.Swap, Excluded.Swap>
+
     @inlinable public init() { excluded = .init() }
     @inlinable public init(included: Included, excluded: Excluded) {
         self.included = included
@@ -63,4 +81,15 @@ public struct Mixed<Included: Storage, Excluded: Storage>: Storage {
     }
 
     public var included: Included = .init(), excluded: Excluded
+}
+public struct MixedEI<Excluded: Storage, Included: Storage>: Storage {
+    public typealias Swap = MixedIE<Included.Swap, Excluded.Swap>
+
+    @inlinable public init() { excluded = .init() }
+    @inlinable public init(included: Included, excluded: Excluded) {
+        self.included = included
+        self.excluded = excluded
+    }
+
+    public var excluded: Excluded, included: Included = .init()
 }

@@ -16,13 +16,13 @@ public extension ByteZeroable {
 
 extension Empty: ByteZeroable { }
 extension Scalar: ByteZeroable { }
-extension Mixed: ByteZeroable where Included: ByteZeroable, Excluded: ByteZeroable { }
+extension MixedIE: ByteZeroable where Included: ByteZeroable, Excluded: ByteZeroable { }
 
 // MARK: ExpressibleByFloatLiteral
 
 extension Scalar: ExpressibleByFloatLiteral {
     @inlinable public init(floatLiteral value: ScalarValue.FloatLiteralType) { scalar = .init(floatLiteral: value) }
 }
-extension Mixed where Excluded: ExpressibleByFloatLiteral {
+extension MixedIE where Excluded: ExpressibleByFloatLiteral {
     @inlinable public init(floatLiteral value: Excluded.FloatLiteralType) { excluded = .init(floatLiteral: value) }
 }

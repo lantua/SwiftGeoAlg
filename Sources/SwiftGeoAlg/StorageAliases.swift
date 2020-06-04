@@ -19,22 +19,22 @@ public protocol StorageAliases {
     associatedtype Grade4: Storage = _Grade4<Self>
     associatedtype Grade5: Storage = _Grade5<Self>
 }
-public typealias _Even<S: StorageAliases> = Mixed<S.Reduced.Odd, S.Reduced.Even>
-public typealias _Odd<S: StorageAliases> = Mixed<S.Reduced.Even, S.Reduced.Odd>
-public typealias _Full<S: StorageAliases> = Mixed<S.Reduced.Full, S.Reduced.Full>
-public typealias _Grade1<S: StorageAliases> = Mixed<Scalar, S.Reduced.Grade1>
-public typealias _Grade2<S: StorageAliases> = Mixed<S.Reduced.Grade1, S.Reduced.Grade2>
-public typealias _Grade3<S: StorageAliases> = Mixed<S.Reduced.Grade2, S.Reduced.Grade3>
-public typealias _Grade4<S: StorageAliases> = Mixed<S.Reduced.Grade3, S.Reduced.Grade4>
-public typealias _Grade5<S: StorageAliases> = Mixed<S.Reduced.Grade4, S.Reduced.Grade5>
+public typealias _Even<S: StorageAliases> = MixedIE<S.Reduced.Odd, S.Reduced.Even>
+public typealias _Odd<S: StorageAliases> = MixedIE<S.Reduced.Even, S.Reduced.Odd>
+public typealias _Full<S: StorageAliases> = MixedIE<S.Reduced.Full, S.Reduced.Full>
+public typealias _Grade1<S: StorageAliases> = MixedIE<Scalar, S.Reduced.Grade1>
+public typealias _Grade2<S: StorageAliases> = MixedIE<S.Reduced.Grade1, S.Reduced.Grade2>
+public typealias _Grade3<S: StorageAliases> = MixedIE<S.Reduced.Grade2, S.Reduced.Grade3>
+public typealias _Grade4<S: StorageAliases> = MixedIE<S.Reduced.Grade3, S.Reduced.Grade4>
+public typealias _Grade5<S: StorageAliases> = MixedIE<S.Reduced.Grade4, S.Reduced.Grade5>
 
 public enum Storage1D: StorageAliases {
     public typealias Reduced = Self
     public typealias Even = Empty
     public typealias Odd = Scalar
-    public typealias Full = Mixed<Scalar, Scalar>
+    public typealias Full = MixedIE<Scalar, Scalar>
 
-    public typealias Grade1 = Mixed<Grade0, Empty>
+    public typealias Grade1 = MixedIE<Grade0, Empty>
     public typealias Grade2 = Empty
     public typealias Grade3 = Empty
     public typealias Grade4 = Empty
