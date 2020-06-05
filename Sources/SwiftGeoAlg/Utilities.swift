@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: Byte zeroable
 
-public protocol ByteZeroable: Storage { }
+public protocol ByteZeroable { }
 public extension ByteZeroable {
     mutating func reset() { _ = withUnsafeMutableBytes(of: &self) { memset($0.baseAddress, 0, $0.count) } }
 }
@@ -17,6 +17,7 @@ public extension ByteZeroable {
 extension Empty: ByteZeroable { }
 extension Scalar: ByteZeroable { }
 extension MixedIE: ByteZeroable where Included: ByteZeroable, Excluded: ByteZeroable { }
+extension Vector: ByteZeroable where S: ByteZeroable { }
 
 // MARK: ExpressibleByFloatLiteral
 

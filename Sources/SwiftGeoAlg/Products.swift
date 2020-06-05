@@ -13,7 +13,7 @@
     var lhs: L { get }
     var rhs: R { get }
 
-    func add<O>(into out: inout O, state: PrimaryMultiplierState) where O: Storage
+    func add<O>(into out: inout O, state: ProductState) where O: Storage
     associatedtype II: Product where II.L == L.Included, II.R == R.Included, II.Chain == Chain.Tail
     associatedtype IE: Product where IE.L == L.Included, IE.R == R.Excluded, IE.Chain == Chain.Tail
     associatedtype EI: Product where EI.L == L.Excluded, EI.R == R.Included, EI.Chain == Chain.Tail
@@ -26,7 +26,7 @@
         self.rhs = rhs
     }
 
-    @inlinable func add<O>(into out: inout O, state: PrimaryMultiplierState) where O : Storage { }
+    @inlinable func add<O>(into out: inout O, state: ProductState) where O : Storage { }
     @usableFromInline typealias II = ProductNone<L.Included, R.Included, Chain.Tail>
     @usableFromInline typealias IE = ProductNone<L.Included, R.Excluded, Chain.Tail>
     @usableFromInline typealias EI = ProductNone<L.Excluded, R.Included, Chain.Tail>
@@ -46,7 +46,7 @@ public struct OuterProduct<L: Storage, R: Storage, Chain: BasisChain>: Product {
     @usableFromInline typealias EE = OuterProduct<L.Excluded, R.Excluded, Chain.Tail>
 }
 
-@usableFromInline enum PrimaryMultiplierState {
+@usableFromInline enum ProductState {
     case add, subtract, involuteAdd, involuteSubtract
 
     @inlinable var flip: Self {
@@ -76,14 +76,14 @@ public struct OuterProduct<L: Storage, R: Storage, Chain: BasisChain>: Product {
 }
 
 extension Product {
-    @inlinable public static func +=<B: Basis, O: Storage>(lhs: inout Algebra<B>.Vector<O>, rhs: Self) where B.Chain == Chain {
+    @inlinable public static func +=<O: Storage>(lhs: inout Vector<Chain, O>, rhs: Self) {
         rhs.add(into: &lhs.storage, state: .add)
     }
-    @inlinable public static func -=<B: Basis, O: Storage>(lhs: inout Algebra<B>.Vector<O>, rhs: Self) where B.Chain == Chain {
+    @inlinable public static func -=<O: Storage>(lhs: inout Vector<Chain, O>, rhs: Self) {
         rhs.add(into: &lhs.storage, state: .subtract)
     }
 
-    @inlinable func add<O>(into out: inout O, state: PrimaryMultiplierState) where O: Storage {
+    @inlinable func add<O>(into out: inout O, state: ProductState) where O: Storage {
         // Unnecessary, but would help on debug build.
         guard !(out is Empty), !(lhs is Empty), !(rhs is Empty) else { return }
 

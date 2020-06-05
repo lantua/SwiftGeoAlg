@@ -25,12 +25,12 @@ infix operator ∧: OuterMultiplicationPrecedence
 public protocol Accumulable {
     associatedtype Chain: BasisChain
 
-    static func +=<B: Basis, O: Storage>(lhs: inout Algebra<B>.Vector<O>, rhs: Self) where B.Chain == Chain
-    static func -=<B: Basis, O: Storage>(lhs: inout Algebra<B>.Vector<O>, rhs: Self) where B.Chain == Chain
+    static func +=<O: Storage>(lhs: inout Vector<Chain, O>, rhs: Self)
+    static func -=<O: Storage>(lhs: inout Vector<Chain, O>, rhs: Self)
 }
 
-public extension Algebra.Vector {
-    @inlinable static func ∧<O>(lhs: Self, rhs: Algebra.Vector<O>) -> OuterProduct<S, O, Bases.Chain> where O: Storage {
+public extension Vector {
+    @inlinable static func ∧<O>(lhs: Self, rhs: Vector<Chain, O>) -> OuterProduct<S, O, Chain> where O: Storage {
         .init(lhs.storage, rhs.storage)
     }
 }
