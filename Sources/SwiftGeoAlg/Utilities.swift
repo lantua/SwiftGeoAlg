@@ -16,7 +16,7 @@ public extension ByteZeroable {
 
 extension Empty: ByteZeroable { }
 extension Scalar: ByteZeroable { }
-extension MixedIE: ByteZeroable where Included: ByteZeroable, Excluded: ByteZeroable { }
+extension Mixed: ByteZeroable where Included: ByteZeroable, Excluded: ByteZeroable { }
 extension Vector: ByteZeroable where S: ByteZeroable { }
 
 // MARK: ExpressibleByFloatLiteral
@@ -24,6 +24,6 @@ extension Vector: ByteZeroable where S: ByteZeroable { }
 extension Scalar: ExpressibleByFloatLiteral {
     @inlinable public init(floatLiteral value: ScalarValue.FloatLiteralType) { scalar = .init(floatLiteral: value) }
 }
-extension MixedIE where Excluded: ExpressibleByFloatLiteral {
+extension Mixed where Excluded: ExpressibleByFloatLiteral {
     @inlinable public init(floatLiteral value: Excluded.FloatLiteralType) { excluded = .init(floatLiteral: value) }
 }

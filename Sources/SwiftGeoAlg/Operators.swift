@@ -23,14 +23,23 @@ infix operator ⌊: InnerMultiplicationPrecedence
 infix operator ∧: OuterMultiplicationPrecedence
 
 public protocol Accumulable {
-    associatedtype Chain: BasisChain
+    associatedtype Bases: BasisChain
 
-    static func +=<O: Storage>(lhs: inout Vector<Chain, O>, rhs: Self)
-    static func -=<O: Storage>(lhs: inout Vector<Chain, O>, rhs: Self)
+    static func +=<O>(lhs: inout Vector<Bases, O>, rhs: Self)
+    static func -=<O>(lhs: inout Vector<Bases, O>, rhs: Self)
 }
 
-public extension Vector {
-    @inlinable static func ∧<O>(lhs: Self, rhs: Vector<Chain, O>) -> OuterProduct<S, O, Chain> where O: Storage {
-        .init(lhs.storage, rhs.storage)
+@usableFromInline protocol _Accumulable: Accumulable {
+    func add<O: Storage>(to out: inout O)
+    func subtract<O: Storage>(from out: inout O)
+}
+extension _Accumulable {
+    @inlinable public static func +=<O>(lhs: inout Vector<Bases, O>, rhs: Self) {
+        rhs.add(to: &lhs.storage)
+    }
+    @inlinable public static func -=<O>(lhs: inout Vector<Bases, O>, rhs: Self) {
+        rhs.subtract(from: &lhs.storage)
     }
 }
+
+@inlinable public func ∧<L, R>(lhs: L, rhs: R) -> OuterProduct<L, R> { .init(lhs, rhs) }
