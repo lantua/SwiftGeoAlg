@@ -8,13 +8,17 @@
 public typealias ScalarValue = Double
 
 public protocol ScalarProtocol {
+    associatedtype Negate: ScalarProtocol
     var value: ScalarValue { get set }
+    var negate: Negate  { get }
 }
 extension Never: ScalarProtocol {
     public var value: ScalarValue { get { unreachable() } set { } }
+    public var negate: Self { unreachable() }
 }
 extension ScalarValue: ScalarProtocol {
     @inlinable public var value: ScalarValue { get { self } set { self = newValue } }
+    @inlinable public var negate: ScalarValue { get { -self } }
 }
 
 public protocol Storage {

@@ -5,7 +5,7 @@
 //  Created by Natchanon Luangsomboon on 1/6/2563 BE.
 //
 
-@usableFromInline protocol Product: _Accumulable {
+@usableFromInline protocol Product: Accumulable {
     associatedtype L: VectorProtocol
     associatedtype R: VectorProtocol
 
@@ -45,8 +45,12 @@ public struct OuterProduct<L: VectorProtocol, R: VectorProtocol>: Product where 
 }
 
 extension Product {
-    @inlinable public func add<O: Storage>(to out: inout O) { add(into: &out, state: .add) }
-    @inlinable public func subtract<O: Storage>(from out: inout O) { add(into: &out, state: .subtract) }
+    @inlinable public static func +=<O: Storage>(lhs: inout Vector<Bases, O>, rhs: Self) {
+        rhs.add(into: &lhs.storage, state: .add)
+    }
+    @inlinable public static func -=<O: Storage>(lhs: inout Vector<Bases, O>, rhs: Self) {
+        rhs.add(into: &lhs.storage, state: .subtract)
+    }
 
     @inlinable func add<O: Storage>(into out: inout O, state: ProductState) {
         // Unnecessary, but would help on debug build.

@@ -85,7 +85,7 @@ final class SwiftGeoAlgTests: XCTestCase {
 
         measure {
             for _ in 0..<500000 {
-                result += a ∧ b
+                result += -a ∧ -b
             }
         }
 
@@ -97,7 +97,7 @@ final class SwiftGeoAlgTests: XCTestCase {
 
         measure {
             for _ in 0..<500000 {
-                result += a
+                result -= a
             }
         }
 
