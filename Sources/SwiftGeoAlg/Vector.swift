@@ -42,13 +42,13 @@ public struct Negated<V: VectorProtocol>: VectorProtocol {
 
     @inlinable public var negated: V { base }
 }
-public struct Reverse<V: VectorProtocol>: VectorProtocol {
+public struct Involuted<V: VectorProtocol>: VectorProtocol {
     public typealias Bases = V.Bases
     @usableFromInline var base: V
     @inlinable init(base: V) { self.base = base }
 
-    @inlinable public var included: Reverse<V.Included.NegateType> { .init(base: base.included.negated) }
-    @inlinable public var excluded: Reverse<V.Excluded> { .init(base: base.excluded) }
+    @inlinable public var included: Involuted<V.Included.NegateType> { .init(base: base.included.negated) }
+    @inlinable public var excluded: Involuted<V.Excluded> { .init(base: base.excluded) }
     @inlinable public var scalar: V.ScalarType { base.scalar }
 }
 
